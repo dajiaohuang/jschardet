@@ -330,6 +330,13 @@ describe('jschardet CLI — in-process', () => {
     expect(c.stdout()).not.toBe(`jschardet ${VERSION}\n`);
   });
 
+  test.each(['--help', '--version'])('%s ignores an invalid choice', async flag => {
+    const c = captured();
+    expect(await main([flag, '-e', 'not-an-era'], c.opts)).toBe(0);
+    expect(c.stderr()).toBe('');
+    expect(c.stdout()).not.toBe('');
+  });
+
   test('--help lists --encoding-era and the derived era names', async () => {
     const c = captured();
     const code = await main(['--help'], c.opts);

@@ -132,12 +132,6 @@ export async function main(argv: string[], opts: MainOptions = {}): Promise<numb
 
   const files = parsed.positionals;
   const values = parsed.values as CliValues;
-  const eraName = values['encoding-era'];
-  if (eraName !== undefined && !ERA_NAMES.includes(eraName.toLowerCase())) {
-    writeErr(`jschardet: argument --encoding-era: invalid choice: '${eraName}' (choose from ${ERA_NAMES.join(', ')})\n`);
-    return 2;
-  }
-
   if (values.help) {
     write(formatHelp());
     return 0;
@@ -147,6 +141,17 @@ export async function main(argv: string[], opts: MainOptions = {}): Promise<numb
     write(`jschardet ${VERSION}\n`);
     return 0;
   }
+
+  for (const option of OPTIONS) {
+    const value = parsed.values[option.name];
+    if (option.choices && typeof value === 'string' &&
+        !option.choices.some(choice => choice.toLowerCase() === value.toLowerCase())) {
+      writeErr(`jschardet: argument --${option.name}: invalid choice: '${value}' (choose from ${option.choices.join(', ')})\n`);
+      return 2;
+    }
+  }
+
+  const eraName = values['encoding-era'];
 
   const minimal = values.minimal ?? false;
   const language = values.language ?? false;
